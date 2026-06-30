@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>SnapBooth &mdash; Your Photo</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --text: #000000;
+        --text-muted: #555555;
+        --border: #000000;
+        --font: "Courier New", Courier, monospace;
+        --transition: 0.15s ease-in-out;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .container {
+        max-width: 900px;
+        width: 100%;
+        padding: 2rem 1.5rem;
+      }
+
+      /* BRAND HEADER */
+      .brand-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 24px 0 20px;
+        border-bottom: 2px dashed var(--border);
+        margin-bottom: 2rem;
+      }
+      .brand-logo {
+        width: 110px;
+        height: 110px;
+        margin-bottom: 8px;
+      }
+      .brand-logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      .brand-name {
+        font-size: 1.25rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+      }
+      .brand-tagline {
+        font-size: 0.65rem;
+        color: var(--text-muted);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-top: 2px;
+      }
+
+      .badge-expires {
+        font-size: 0.7rem;
+        border: 1px solid var(--border);
+        padding: 2px 6px;
+        white-space: nowrap;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-top: 8px;
+      }
+
+      /* COMPOSED PHOTO */
+      .composed-wrap {
+        margin-bottom: 1.5rem;
+        border: 2px solid var(--border);
+      }
+      .composed-wrap img {
+        width: 100%;
+        display: block;
+      }
+
+      /* INFO */
+      .meta {
+        margin-bottom: 2rem;
+        text-align: center;
+      }
+      .meta .name {
+        font-size: 1.25rem;
+        font-weight: bold;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .meta .name.muted {
+        opacity: 0.5;
+        font-weight: normal;
+        text-transform: none;
+        letter-spacing: normal;
+      }
+      .meta .taken {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+      }
+
+      /* GALLERY — GIF */
+      .gallery-section {
+        border-top: 2px dashed var(--border);
+        padding-top: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+      .gallery-section h2 {
+        font-size: 0.75rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+
+      .gif-wrap {
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto 1.5rem;
+        border: 2px solid var(--border);
+      }
+      .gif-wrap img {
+        width: 100%;
+        display: block;
+      }
+      .gif-label {
+        text-align: center;
+        font-size: 0.65rem;
+        color: var(--text-muted);
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        margin: -0.75rem auto 1.5rem;
+      }
+
+      /* MAIN LAYOUT */
+      .main-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        width: 100%;
+        margin-bottom: 2rem;
+      }
+      .layout-left,
+      .layout-right {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      @media (min-width: 768px) {
+        .main-layout {
+          display: grid;
+          grid-template-columns: 1.1fr 0.9fr;
+          gap: 3rem;
+          align-items: start;
+        }
+        .layout-right .gallery-section:first-child {
+          border-top: none;
+          padding-top: 0;
+        }
+      }
+
+      /* GALLERY — RAW PHOTOS GRID */
+      .gallery-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .gallery-grid img {
+        width: 100%;
+        height: auto;
+        display: block;
+        border: 2px solid var(--border);
+      }
+
+      /* EXPIRY */
+      .expiry {
+        text-align: center;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 1.5rem;
+      }
+      .expiry strong {
+        color: var(--text);
+      }
+
+      /* BUTTONS */
+      .btn-download {
+        display: block;
+        width: 100%;
+        padding: 12px 24px;
+        background: var(--border);
+        border: 2px solid var(--border);
+        color: var(--bg);
+        font-family: var(--font);
+        font-size: 1rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        transition:
+          background var(--transition),
+          color var(--transition);
+      }
+      .btn-download:hover,
+      .btn-download:focus-visible {
+        background: var(--bg);
+        color: var(--border);
+        outline: none;
+      }
+      .btn-download:active {
+        transform: scale(0.98);
+      }
+
+      .btn-download + .btn-download {
+        margin-top: 8px;
+      }
+
+      .btn-download-secondary {
+        display: block;
+        width: 100%;
+        padding: 12px 24px;
+        background: transparent;
+        border: 2px dashed var(--border);
+        color: var(--text);
+        font-family: var(--font);
+        font-size: 1rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        transition:
+          background var(--transition),
+          color var(--transition);
+      }
+      .btn-download-secondary:hover,
+      .btn-download-secondary:focus-visible {
+        background: var(--border);
+        color: var(--bg);
+        outline: none;
+      }
+
+      /* STATES */
+      .loading {
+        text-align: center;
+        padding: 4rem 1rem;
+        color: var(--text-muted);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+      }
+      .loading::after {
+        content: "";
+        display: block;
+        width: 24px;
+        height: 2px;
+        background: var(--border);
+        margin: 12px auto 0;
+        animation: pulse 1s infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.3;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      .error-state {
+        text-align: center;
+        padding: 4rem 1rem;
+      }
+      .error-state .x-mark {
+        display: block;
+        font-size: 3rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        letter-spacing: 0;
+      }
+      .error-state h2 {
+        font-size: 1.25rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 0.75rem;
+      }
+      .error-state p {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+      }
+
+      div.expired h2 {
+        text-decoration: line-through;
+        opacity: 0.4;
+      }
+      div.expired h2 .x-mark {
+        opacity: 0.4;
+      }
+
+      /* HEADER INFO CARD */
+      .header-info-card {
+        width: 100%;
+        border: 2px solid var(--border);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      .meta-info {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .name-taken {
+        font-size: 1.15rem;
+        font-weight: bold;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .name-taken .name {
+        font-size: 1.15rem;
+        font-weight: bold;
+      }
+      .name-taken .name.muted {
+        opacity: 0.5;
+        font-weight: normal;
+        text-transform: none;
+        letter-spacing: normal;
+      }
+      .name-taken .taken {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        font-weight: normal;
+        text-transform: none;
+      }
+      .header-info-card .expiry {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0;
+      }
+      .header-info-card .expiry strong {
+        color: var(--text);
+      }
+      .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+      }
+      @media (min-width: 768px) {
+        .header-info-card {
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .meta-info {
+          text-align: left;
+          align-items: flex-start;
+        }
+        .name-taken {
+          justify-content: flex-start;
+        }
+        .action-buttons {
+          width: auto;
+          min-width: 340px;
+        }
+      }
+
+      /* FOOTER */
+      .footer {
+        text-align: center;
+        font-size: 0.65rem;
+        color: var(--text-muted);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 2rem 0 1rem;
+        border-top: 1px solid var(--text-muted);
+        margin-top: 2rem;
+        opacity: 0.4;
+      }
+
+      @media (max-width: 480px) {
+        .container {
+          padding: 1rem;
+        }
+        .brand-header {
+          margin-bottom: 1.25rem;
+        }
+        .btn-download {
+          padding: 16px 24px;
+          font-size: 0.9rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" id="app">
+      <div class="loading">Loading&hellip;</div>
+    </div>
+
+    <script>
+      (function () {
+        var sessionId = window.location.pathname;
+        if (sessionId.indexOf("/view/") === 0) {
+          sessionId = sessionId.slice(6);
+        } else {
+          sessionId = sessionId.split("/view/")[1];
+        }
+
+        var app = document.getElementById("app");
+
+        if (!sessionId) {
+          renderError("Invalid Link", "No session ID found in the URL.");
+          return;
+        }
+
+        function escapeHtml(s) {
+          var d = document.createElement("div");
+          d.textContent = s;
+          return d.innerHTML;
+        }
+
+        function pluralDays(n) {
+          if (n > 1) return n + " days";
+          if (n === 1) return "1 day";
+          return "Less than a day";
+        }
+
+        function triggerDownload(url, filename) {
+          var a = document.createElement("a");
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }
+
+        function renderBrandHeader(expiresText) {
+          return (
+            '<div class="brand-header">' +
+            '<div class="brand-logo">' +
+            '<img src="/assets/logo.png" alt="SnapBooth Logo">' +
+            "</div>" +
+            '<div class="brand-name">SnapBooth</div>' +
+            '<div class="brand-tagline">Orbit of Your Best Moments.</div>' +
+            (expiresText
+              ? '<div class="badge-expires">' + expiresText + "</div>"
+              : "") +
+            "</div>"
+          );
+        }
+
+        function renderError(title, message) {
+          app.innerHTML =
+            renderBrandHeader("") +
+            '<div class="error-state">' +
+            '<span class="x-mark">X</span>' +
+            "<h2>" +
+            title +
+            "</h2>" +
+            "<p>" +
+            message +
+            "</p>" +
+            "</div>" +
+            '<div class="footer">SnapBooth &mdash; photobooth</div>';
+        }
+
+        fetch("/api/sessions/" + encodeURIComponent(sessionId))
+          .then(function (res) {
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return res.json();
+          })
+          .then(function (json) {
+            if (!json.success || !json.data) throw new Error("No data");
+
+            var data = json.data;
+            var now = new Date();
+            var expiresAt = new Date(data.expires_at);
+            var created = new Date(data.created_at);
+            var expired = now > expiresAt;
+
+            if (expired) {
+              app.innerHTML =
+                renderBrandHeader("Expired") +
+                '<div class="error-state expired">' +
+                '<span class="x-mark">X</span>' +
+                "<h2>Link Expired</h2>" +
+                "<p>This photo link expired " +
+                pluralDays(
+                  Math.ceil((now - expiresAt) / (1000 * 60 * 60 * 24)),
+                ) +
+                " ago.<br>Photos are available for 3 days after capture.</p>" +
+                "</div>" +
+                '<div class="footer">SnapBooth &mdash; photobooth</div>';
+              return;
+            }
+
+            var name = data.name || "Anonymous";
+            var nameHtml = data.name
+              ? '<div class="name">' + escapeHtml(name) + "</div>"
+              : '<div class="name muted">Anonymous</div>';
+            var takenDate = created.toLocaleString(undefined, {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+
+            var expiresIn = Math.max(
+              0,
+              Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24)),
+            );
+            var expiresText = pluralDays(expiresIn) + " left";
+
+            var videoButtonHtml = data.video_url
+              ? '<a class="btn-download btn-download-secondary" id="btn-video">Download Video</a>'
+              : '';
+            var videoSectionHtml = data.video_url
+              ? '<div class="gallery-section">' +
+                  '<h2>Behind the Scenes Video</h2>' +
+                  '<div class="gif-wrap">' +
+                    '<video src="' + data.video_url + '" autoPlay loop muted playsInline style="width: 100%; display: block; border: none;"></video>' +
+                  '</div>' +
+                '</div>'
+              : '';
+
+            var fragment =
+              renderBrandHeader(expiresText) +
+              '<div class="header-info-card">' +
+                '<div class="meta-info">' +
+                  '<div class="name-taken">' +
+                    nameHtml + ' &bull; <span class="taken">' + takenDate + '</span>' +
+                  '</div>' +
+                  '<div class="expiry">Expires in <strong>' + pluralDays(expiresIn) + '</strong></div>' +
+                '</div>' +
+                '<div class="action-buttons">' +
+                  '<a class="btn-download" id="btn-composed">Download Composed Photo</a>' +
+                  '<a class="btn-download btn-download-secondary" id="btn-gif">Download GIF</a>' +
+                  videoButtonHtml +
+                '</div>' +
+              '</div>' +
+              '<div class="main-layout">' +
+                '<div class="layout-left">' +
+                  '<div class="composed-wrap">' +
+                    '<img src="' + data.composed_url + '" alt="Composed photo">' +
+                  '</div>' +
+                '</div>' +
+                '<div class="layout-right">' +
+                  '<div class="gallery-section">' +
+                    '<h2>Animated GIF</h2>' +
+                    '<div class="gif-wrap">' +
+                      '<img src="' + data.gif_url + '" alt="Animated GIF">' +
+                    '</div>' +
+                  '</div>' +
+                  videoSectionHtml +
+                  '<div class="gallery-section">' +
+                    '<h2>Raw Photos</h2>' +
+                    '<div class="gallery-grid" id="grid-container"></div>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+              '<div class="footer">SnapBooth &mdash; photobooth</div>';
+
+            app.innerHTML = fragment;
+
+            var gridEl = document.getElementById("grid-container");
+            data.photos.forEach(function (url) {
+              var gi = document.createElement("img");
+              gi.src = url;
+              gi.alt = "Photo";
+              gi.loading = "lazy";
+              gridEl.appendChild(gi);
+            });
+
+            var nameSlug = data.name
+              ? data.name.replace(/\s+/g, "_")
+              : "snapbooth";
+
+            document
+              .getElementById("btn-composed")
+              .addEventListener("click", function (e) {
+                e.preventDefault();
+                triggerDownload(data.composed_url, nameSlug + "_composed.jpg");
+              });
+
+            document
+              .getElementById("btn-gif")
+              .addEventListener("click", function (e) {
+                e.preventDefault();
+                triggerDownload(data.gif_url, nameSlug + "_animated.gif");
+              });
+
+            if (data.video_url) {
+              document
+                .getElementById("btn-video")
+                .addEventListener("click", function (e) {
+                  e.preventDefault();
+                  triggerDownload(data.video_url, nameSlug + "_video.mp4");
+                });
+            }
+          })
+          .catch(function (err) {
+            renderError(
+              "Photo Not Found",
+              "The photo you're looking for doesn't exist or has been removed.",
+            );
+          });
+      })();
+    </script>
+  </body>
+</html>

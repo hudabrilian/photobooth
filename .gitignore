@@ -1,0 +1,11 @@
+node_modules/
+dist/
+prints/*
+!prints/.gitkeep
+data/*
+!data/.gitkeep
+*.db
+.env
+.DS_Store
+CatPrinterBLE.exe
+
